@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Colorizer</string>
+
+    <string name="permission_preference">Permission Preference</string>
+    <string name="permission_storage">Permission Storage</string>
+</resources>
