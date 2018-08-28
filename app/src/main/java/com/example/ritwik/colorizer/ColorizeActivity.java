@@ -8,9 +8,11 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -43,6 +45,8 @@ public class ColorizeActivity extends AppCompatActivity {
     ImageView ivColorize;
     File uploadFile;
     MenuItem buSave;
+    boolean isBig;
+    int sliderHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,9 +59,11 @@ public class ColorizeActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String imageUri = intent.getStringExtra("imageUri");
+        isBig = intent.getExtras().getBoolean("Big");
+        sliderHeight = intent.getExtras().getInt("Height");
         uri = Uri.parse(imageUri);
 
-        String filePath = "/storage/emulated/0/Colorizer/upload.jpg";
+        String filePath = "/storage/emulated/0/Colorizer/display.jpg";
         uploadFile = new File(filePath);
         Uri myUri = Uri.fromFile(uploadFile);
 
@@ -88,7 +94,7 @@ public class ColorizeActivity extends AppCompatActivity {
                 new Thread(new Runnable() {
                     public void run() {
 
-                        Bitmap myBitmap = getBitmapfromURL("http://ec2-52-71-24-249.compute-1.amazonaws.com/colored/col_"+ filename + ".png");
+                        Bitmap myBitmap = getBitmapfromURL("http://ec2-18-222-228-140.us-east-2.compute.amazonaws.com/colored/col_"+ filename + ".png");
                         storeColoredImage(myBitmap);
 
                     }
@@ -99,7 +105,14 @@ public class ColorizeActivity extends AppCompatActivity {
 
     public void uploadImage(){
 
-        String filePath = "/storage/emulated/0/Colorizer/upload.jpg";
+        String filePath;
+        if (isBig){
+            filePath = "/storage/emulated/0/Colorizer/upload.jpg";
+        }
+        else{
+            filePath = "/storage/emulated/0/Colorizer/display.jpg";
+        }
+
         final File originalfile=new File(filePath);
 
         RequestBody filepart=RequestBody.create(
@@ -107,10 +120,10 @@ public class ColorizeActivity extends AppCompatActivity {
                 originalfile
         );
 
-        Log.e("file name", uploadFile.getName());
-        MultipartBody.Part file=MultipartBody.Part.createFormData("photo",uploadFile.getName(), filepart);
+        Log.e("file name", originalfile.getName());
+        MultipartBody.Part file=MultipartBody.Part.createFormData("photo",originalfile.getName(), filepart);
 
-        String baseUrl="http://ec2-52-71-24-249.compute-1.amazonaws.com/";
+        String baseUrl="http://ec2-18-222-228-140.us-east-2.compute.amazonaws.com/";
         Retrofit retrofit= new Retrofit.Builder().baseUrl(baseUrl).
                 addConverterFactory(GsonConverterFactory.create()).build();
 
@@ -126,10 +139,11 @@ public class ColorizeActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                String black_white="http://ec2-52-71-24-249.compute-1.amazonaws.com/original/"+ filename + ".jpg";
-                String colored="http://ec2-52-71-24-249.compute-1.amazonaws.com/colored/col_"+ filename + ".png";
+                String black_white="http://ec2-18-222-228-140.us-east-2.compute.amazonaws.com/original/"+ filename + ".jpg";
+                String colored="http://ec2-18-222-228-140.us-east-2.compute.amazonaws.com/colored/col_"+ filename + ".png";
                 setSlider(black_white, colored);
 
+                originalfile.delete();
                 uploadFile.delete();
 
             }
@@ -147,6 +161,9 @@ public class ColorizeActivity extends AppCompatActivity {
         Log.e("col", colored);
         slider.setBeforeImage(colored).setAfterImage(blackWhite);
         ivColorize.setVisibility(View.GONE);
+        ViewGroup.LayoutParams lp = slider.getLayoutParams();
+        lp.height = sliderHeight;
+        slider.setLayoutParams(lp);
         slider.setVisibility(View.VISIBLE);
         buSave.setVisible(true);
     }

@@ -33,6 +33,9 @@ public class ChooseImageActivity extends AppCompatActivity {
     private static final int TXT_STORAGE = 2;
     private PermissionUtil permissionUtil;
     TextView tv;
+    private int displayBitmapSize;
+    private boolean isBig=false;
+    int uploadHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,10 +90,12 @@ public class ChooseImageActivity extends AppCompatActivity {
 
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-                storeUploadImage(bitmap);
+                storeImage(bitmap);
 
                 Intent intent = new Intent(this, ColorizeActivity.class);
                 intent.putExtra("imageUri",uri.toString());
+                intent.putExtra("Big",isBig);
+                intent.putExtra("Height",uploadHeight);
                 startActivity(intent);
 
             } catch (IOException e) {
@@ -151,9 +156,10 @@ public class ChooseImageActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private void storeUploadImage(Bitmap image) {
+    private void storeImage(Bitmap image) {
         File pictureFile = getOutputMediaFile();
         Bitmap newImage = getResizedBitmap(image);
+        uploadHeight = newImage.getHeight();
         if (pictureFile == null) {
             Log.d("Error",
                     "Error creating media file, check storage permissions: ");// e.getMessage());
@@ -168,6 +174,25 @@ public class ChooseImageActivity extends AppCompatActivity {
         } catch (IOException e) {
             Log.d("Error", "Error accessing file: " + e.getMessage());
         }
+
+        if( displayBitmapSize > 300 ) {
+            File pictureDir = new File("/storage/emulated/0/Colorizer/");
+            isBig=true;
+
+            String mImageName="upload.jpg" ;
+            File mediaFile = new File(pictureDir.getPath() + File.separator + mImageName);
+            Bitmap newBitmap = Bitmap.createScaledBitmap(newImage, newImage.getWidth()/2, newImage.getHeight()/2, false);
+            try {
+                FileOutputStream fos = new FileOutputStream(mediaFile);
+                newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                fos.close();
+            } catch (FileNotFoundException e) {
+                Log.d("Error", "File not found: " + e.getMessage());
+            } catch (IOException e) {
+                Log.d("Error", "Error accessing file: " + e.getMessage());
+            }
+
+        }
     }
 
     private  File getOutputMediaFile(){
@@ -181,7 +206,7 @@ public class ChooseImageActivity extends AppCompatActivity {
         }
 
         File mediaFile;
-        String mImageName="upload.jpg" ;
+        String mImageName="display.jpg" ;
         mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
         return mediaFile;
     }
@@ -196,12 +221,20 @@ public class ChooseImageActivity extends AppCompatActivity {
 
         if(newHeight>0) {
             Bitmap newBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, false);
+            displayBitmapSize=bitmap.getAllocationByteCount()/1024;
+            Log.e("Size", String.valueOf(displayBitmapSize));
             return newBitmap;
         }
         else{
             return bitmap;
         }
+    }
 
 
+
+    public float getBitmapSize(Bitmap bitmap){
+        float numBytesByCount = bitmap.getByteCount()/1024;
+
+        return numBytesByCount;
     }
 }

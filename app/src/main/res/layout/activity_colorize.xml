@@ -15,6 +15,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="84dp"
         android:layout_marginTop="8dp"
+        android:elevation="100dp"
         android:background="@mipmap/colorize"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -41,16 +42,17 @@
     <com.example.sliderlibrary.BeforeAfterSlider
         android:id="@+id/mySlider"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="259dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:slider_thumb="@mipmap/white_circle"
+        app:layout_constraintVertical_bias="0.292"
         android:visibility="gone"/>
 
 </android.support.constraint.ConstraintLayout>
