@@ -4,9 +4,16 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.RelativeLayout
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.GlideDrawable
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.example.sliderlibrary.asycn.ClipDrawableProcessorTask
 import kotlinx.android.synthetic.main.slider_layout.view.*
+import java.lang.Exception
+import java.util.logging.Handler
 
 /**
  * Created by Jemo on 12/5/16.
@@ -40,7 +47,25 @@ class BeforeAfterSlider : RelativeLayout, ClipDrawableProcessorTask.OnAfterImage
      * set original image
      */
     fun setBeforeImage(imageUri: String): BeforeAfterSlider {
-        before_image_view_id.loadImage(imageUri)
+        //before_image_view_id.loadImage(imageUri, progressBar)
+
+        Glide.with(context).load(imageUri)
+                .listener(object : RequestListener<String, GlideDrawable> {
+                    override fun onException(e: Exception?, model: String?, target: com.bumptech.glide.request.target.Target<GlideDrawable>?, isFirstResource: Boolean): Boolean {
+                        return false
+                    }
+
+                    override fun onResourceReady(resource: GlideDrawable?, model: String?, target: Target<GlideDrawable>?, isFromMemoryCache: Boolean, isFirstResource: Boolean): Boolean {
+                        progressBar.visibility = View.GONE
+                        seekbar_id.visibility =View.VISIBLE
+                        after_image_view_id.visibility = View.VISIBLE
+                        return false
+                    }
+                })
+                .into(before_image_view_id)
+
+        before_image_view_id.visibility = View.VISIBLE
+
         return this
     }
 
@@ -76,7 +101,7 @@ class BeforeAfterSlider : RelativeLayout, ClipDrawableProcessorTask.OnAfterImage
      * fired up after second image loading will be finished
      */
     override fun onLoadedFinished(loadedSuccess: Boolean) {
-        seekbar_id.stayVisibleOrGone(loadedSuccess)
+        //seekbar_id.stayVisibleOrGone(loadedSuccess)
     }
 
 }

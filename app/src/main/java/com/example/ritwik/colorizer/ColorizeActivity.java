@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.sliderlibrary.BeforeAfterSlider;
@@ -47,6 +48,7 @@ public class ColorizeActivity extends AppCompatActivity {
     MenuItem buSave;
     boolean isBig;
     int sliderHeight;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,7 @@ public class ColorizeActivity extends AppCompatActivity {
 
         ivColorize = findViewById(R.id.ivColorize);
         Button buColorize = findViewById(R.id.buColorize);
+        progressBar = findViewById(R.id.mprogressbar);
         slider = findViewById(R.id.mySlider);
 
         Intent intent = getIntent();
@@ -73,6 +76,8 @@ public class ColorizeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 uploadImage();
+                ivColorize.setVisibility(View.GONE);
+                progressBar.setVisibility(View.VISIBLE);
             }
         });
 
@@ -165,6 +170,7 @@ public class ColorizeActivity extends AppCompatActivity {
         lp.height = sliderHeight;
         slider.setLayoutParams(lp);
         slider.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
         buSave.setVisible(true);
     }
 
